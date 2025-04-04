@@ -3,16 +3,17 @@
 use Backend;
 use Event;
 use System\Classes\PluginBase;
+use Depcore\Orphans\Models\PluginSetting as Settings;
 
 class Plugin extends PluginBase
 {
     public function pluginDetails()
     {
         return [
-            'name' => 'depcore.orphans::lang.plugin.name',
-            'description' => 'depcore.orphans::lang.plugin.description',
+            'name' => 'Orphans plugin',
+            'description' => 'This plugin replaces orphans with non-breaking spaces',
             'author' => 'depcore',
-            'icon' => 'icon-leaf'
+            'icon' => 'ph ph-textbox'
         ];
     }
 
@@ -25,12 +26,82 @@ class Plugin extends PluginBase
     }
 
     public function boot(){
-        Event::listen('cms.template.save', function ($editorExtension, $templateObject, $type) {
-            \Log::info("A $type has been saved");
+
+		Event::listen('cms.template.save', function ($editorExtension, $templateObject, $type) {
+			$this->replace($templateObject->markup);
         });
+
+		$customModels = Settings::get('your_models');
+		if (is_array($customModels))
+		foreach ($customModels as $model) {
+			try {
+				$modelClass = $model['model_class'];
+				$modelFields = $model['model_fields'];
+				if (!class_exists($modelClass)) return;
+
+				$modelClass::extend(function($model) use ($modelFields) {
+					$model->bindEvent('model.beforeSave', function() use ($model,$modelFields) {
+						foreach ($modelFields as $field) {
+							$field =$field['field_name'];
+							if(!isset($model->$field) || $model->$field === null) return;
+							if (is_array($model->$field)) {
+								$model->$field = json_decode($this->replace(json_encode($model->$field)));
+							}
+							else{
+								$model->$field = $this->replace($model->$field);
+							}
+						}
+					});
+				});
+			} catch (\Exception $th) {
+				\Flash::error( $th->getMessage() . "\rGo to Otpahns plugin settings (setting/orphans) and update your model definitions");
+			}
+		}
+
+		if(Settings::get('use_in_tailor')){
+
+			$useInTailor = Settings::get('use_in_tailor');
+			if ($useInTailor) {
+				$tailorModels = Settings::get('tailor_models');
+
+				\Tailor\Models\EntryRecord::extend(function($model) use ($tailorModels) {
+					$model->bindEvent('model.beforeSave', function() use ($model,$tailorModels) {
+						foreach ($tailorModels as $tailorModel) {
+							try {
+								foreach ($tailorModel['model_fields'] as $field) {
+									$field =$field['field_name'];
+									if ($model->field !== null) {
+										# code...
+										$model->$field= $this->replace($model->$field);
+									}
+								}
+
+							} catch (\SystemException $th) {
+								\Flash::error( $th->getMessage() . "\rGo to Otpahns plugin settings (setting/orphans) and update your model definitions");
+							}
+
+						}
+
+					});
+				});
+			}
+		}
     }
 
-    public function replace( $content ) {
+	public function registerSettings()
+	{
+		return [
+			'settings' => [
+				'label' => 'Orphans',
+				'description' => 'Manage which type of content shoud the plugin work wtih.',
+				'category' => 'CATEGORY_CMS',
+				'icon' => 'ph ph-textbox',
+				'class' => Settings::class,
+			]
+		];
+	}
+
+    public function replace(String $content ) : string {
 		if ( empty( $content ) ) {
 			return $content;
 		}
@@ -187,6 +258,7 @@ class Plugin extends PluginBase
 
 		$content = preg_replace( '/(\d+) (r\.)/', '$1&nbsp;$2', $content );
 
-	return $content;
+		return $content;
 	}
+
 }
