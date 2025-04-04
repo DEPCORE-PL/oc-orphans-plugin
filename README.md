@@ -19,5 +19,5 @@ Use the `html_enteties` or `content` twig filter to hide the escaped `$nbsp;` st
 
 ### Future development
 1. Include a setting to support in rainlab.pages to automatically add spaces in content fields, snippets, templates and pages
-2. Indlude a setting to support in rainlab.blog plugin
+2. Include a setting to support in rainlab.blog plugin
 3. add behavior to allow users to extend their fields with this plugin
