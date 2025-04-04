@@ -1,0 +1,83 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+tabs:
+    fields:
+
+        your_models:
+            label: Your models
+            type: repeater
+            span: full
+            comment: This wille extend your models beforeSave method
+            form:
+                fields:
+                    model_class:
+                        label: Model class
+                        type: text
+                        span: auto
+                        comment: Name of the model with namespace
+                    model_fields:
+                        label: Model fields
+                        type: repeater
+                        span: auto
+                        comment: Fields of the model to apply orphans to
+                        form:
+                            fields:
+                                field_name:
+                                    label: Field name
+                                    type: text
+                                    span: full
+                                    comment: Name of the field
+        use_in_tailor:
+            label: Use in Tailor
+            type: switch
+            comment: 'Use this plugin in Tailor'
+            span: row
+            cssClass: col-md-4
+            default: 0
+            tab: Tailor
+        use_in_rainlab_pages:
+            label: Use in RainLab Pages
+            type: switch
+            comment: 'Use this plugin in RainLab Pages'
+            span: row
+            cssClass: col-md-4
+            default: 0
+            tab: RainLab Pages
+        use_in_rainlab_blog:
+            label: Use in RainLab Blog
+            type: switch
+            comment: 'Use this plugin in RainLab Blog'
+            span: row
+            cssClass: col-md-4
+            default: 0
+            tab: RainLab Blog
+        tailor_models:
+            tab: Tailor
+            trigger:
+                action: show
+                field: use_in_tailor
+                condition: checked
+            label: Tailor models
+            type: repeater
+            span: full
+            comment: 'Models to use in Tailor'
+            form:
+                fields:
+                    model_class:
+                        label: Model Name
+                        type: text
+                        span: auto
+                        comment: 'Name of the model'
+                    model_fields:
+                        label: Model Class
+                        type: repeater
+                        span: auto
+                        comment: 'Fields of the model'
+                        form:
+                            fields:
+                                field_name:
+                                    label: Field Name
+                                    type: text
+                                    span: full
+                                    comment: Name of the field

@@ -176,7 +176,6 @@ class Plugin extends PluginBase
 			}
 		}
 
-
 		$re = '/^([aiouwz]|'.preg_replace( '/\./', '\.', implode( '|', $terms ) ).') +/i';
 		$content = preg_replace( $re, '$1$2&nbsp;', $content );
 
