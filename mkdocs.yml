@@ -1,0 +1,8 @@
+site_name: Orphans OctoberCMS Plugin
+site_description: Documentation for the Orphans plugin for OctoberCMS
+site_author: Depcore
+repo_url: https://github.com/DEPCORE-PL/oc-orphans-plugin
+docs_dir: docs
+
+plugins:
+  - search
